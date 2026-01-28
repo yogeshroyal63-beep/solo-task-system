@@ -3,6 +3,7 @@ import BackgroundFX from "../components/BackgroundFX";
 import XPBar from "../components/XPBar";
 import QuestCard from "../components/QuestCard";
 import Navbar from "../components/Navbar";
+import StatsStrip from "../components/StatsStrip";
 
 export default function Home() {
   const [xp, setXp] = useState(8620);
@@ -78,21 +79,43 @@ export default function Home() {
 
         {/* ===== MAIN CONTENT ===== */}
         <main className="px-6 mt-12 space-y-10 max-w-md mx-auto">
-          {activeTab === "home" &&
-            quests.map((quest) => (
+          {activeTab === "home" && (
+            <>
+              {/* ===== HERO QUEST ===== */}
               <QuestCard
-                key={quest.id}
-                quest={quest}
+                quest={quests[0]}
                 status={
-                  completed.has(quest.id)
+                  completed.has(quests[0].id)
                     ? "completed"
-                    : activeQuestId === quest.id
+                    : activeQuestId === quests[0].id
                     ? "active"
                     : "idle"
                 }
-                onAction={() => onQuestAction(quest)}
+                onAction={() => onQuestAction(quests[0])}
               />
-            ))}
+
+              {/* ===== STATS STRIP ===== */}
+              <StatsStrip />
+
+              {/* ===== SECONDARY QUESTS ===== */}
+              <div className="space-y-8 pt-4">
+                {quests.slice(1).map((quest) => (
+                  <QuestCard
+                    key={quest.id}
+                    quest={quest}
+                    status={
+                      completed.has(quest.id)
+                        ? "completed"
+                        : activeQuestId === quest.id
+                        ? "active"
+                        : "idle"
+                    }
+                    onAction={() => onQuestAction(quest)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
 
           {activeTab === "rank" && (
             <div className="text-center mt-24 text-purple-200">
