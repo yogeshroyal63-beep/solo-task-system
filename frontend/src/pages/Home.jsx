@@ -1,141 +1,181 @@
-import BackgroundFX from "../components/BackgroundFX";
-import XPBar from "../components/XPBar";
-import QuestCard from "../components/QuestCard";
-import Navbar from "../components/Navbar";
+import { useEffect, useRef } from "react";
 
-/**
- * ===============================
- * HOME — ACTIVE SYSTEM HUD
- * ===============================
- *
- * This is where the hunter operates.
- * No rituals here — only dominance.
- */
+export default function Home({ hunterStatus = "AWAKENED" }) {
+  const xpCanvasRef = useRef(null);
+  const auraCanvasRef = useRef(null);
 
-export default function Home({ hunterStatus, auraLevel }) {
   /* ===============================
-   * MOCK SYSTEM DATA (FOR NOW)
+   * MOCKED DISPLAY DATA (SAFE)
    * =============================== */
-
-  const hunterProfile = {
-    nickname: "Shadow",
+  const hunter = {
+    nickname: "DevHunter",
     level: 7,
-    currentXP: 8620,
-    maxXP: 10000,
     rank: "A",
-  };
-
-  const quests = [
-    {
-      id: 1,
-      title: "Clear the Dungeon: Crimson Gate",
-      difficulty: "Hard",
-      xp: 420,
-    },
-    {
-      id: 2,
-      title: "Daily Training Session",
+    xp: 8620,
+    maxXp: 10000,
+    streak: 5,
+    tasksToday: 3,
+    focusTime: "1h 45m",
+    mainQuest: {
+      title: "Design the UI for the To-Do App",
       difficulty: "Easy",
       xp: 120,
     },
-    {
-      id: 3,
-      title: "Shadow Extraction Practice",
-      difficulty: "Medium",
-      xp: 260,
-    },
-  ];
+  };
+
+  /* ===============================
+   * XP GRAPH (WAVE)
+   * =============================== */
+  useEffect(() => {
+    const canvas = xpCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, "#7c3aed");
+    gradient.addColorStop(1, "#ec4899");
+
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    for (let x = 0; x < canvas.width; x++) {
+      const progress = hunter.xp / hunter.maxXp;
+      const y =
+        canvas.height / 2 +
+        Math.sin(x * 0.03) * 25 * progress;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }, []);
+
+  /* ===============================
+   * AURA RADAR GRAPH
+   * =============================== */
+  useEffect(() => {
+    const canvas = auraCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = 220;
+    canvas.height = 220;
+
+    const cx = 110;
+    const cy = 110;
+    const radius = 80;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const points = 6;
+    const values = [0.9, 0.7, 0.8, 0.6, 0.85, 0.75];
+
+    ctx.strokeStyle = "rgba(168,85,247,0.6)";
+    ctx.fillStyle = "rgba(168,85,247,0.25)";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    values.forEach((v, i) => {
+      const angle = (Math.PI * 2 * i) / points - Math.PI / 2;
+      const r = radius * v;
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }, []);
 
   /* ===============================
    * RENDER
    * =============================== */
-
   return (
-    <>
-      <BackgroundFX />
+    <div className="min-h-screen text-white px-10 pt-24 pb-16">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h1 className="text-2xl font-bold tracking-widest">
+            SOLO TASK SYSTEM
+          </h1>
+          <p className="text-purple-400 text-sm">
+            @{hunter.nickname}
+          </p>
+        </div>
 
-      <div className="relative min-h-screen text-white pb-24">
-
-        {/* ===== HEADER ===== */}
-        <header className="px-8 pt-6 max-w-6xl mx-auto">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl tracking-[0.45em] uppercase text-purple-300 hud-text">
-              Hunter System
-            </h1>
-
-            <div className="text-right">
-              <p className="text-sm tracking-widest text-purple-200">
-                {hunterProfile.nickname}
-              </p>
-              <p className="text-xs text-purple-400">
-                Rank {hunterProfile.rank}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 max-w-xl">
-            <XPBar
-              level={hunterProfile.level}
-              currentXP={hunterProfile.currentXP}
-              maxXP={hunterProfile.maxXP}
-            />
-          </div>
-        </header>
-
-        {/* ===== MAIN CONTENT ===== */}
-        <main className="px-8 mt-14 space-y-10 max-w-6xl mx-auto">
-
-          {/* ===== SYSTEM STATUS ===== */}
-          <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <SystemStat label="Status" value={hunterStatus} />
-            <SystemStat label="Aura" value={auraLevel} />
-            <SystemStat label="Rank" value={hunterProfile.rank} />
-            <SystemStat label="Level" value={hunterProfile.level} />
-          </section>
-
-          {/* ===== QUEST BOARD ===== */}
-          <section className="space-y-6">
-            <h2 className="text-sm tracking-[0.4em] uppercase text-purple-400">
-              Active Quests
-            </h2>
-
-            <div className="space-y-4">
-              {quests.map((quest) => (
-                <QuestCard
-                  key={quest.id}
-                  quest={quest}
-                  status="idle"
-                  onAction={() => {}}
-                />
-              ))}
-            </div>
-          </section>
-        </main>
-
-        {/* ===== NAV ===== */}
-        <Navbar />
+        <div className="text-right">
+          <p className="text-xs text-purple-300 uppercase tracking-widest">
+            Rank
+          </p>
+          <p className="text-xl font-semibold">{hunter.rank}</p>
+        </div>
       </div>
-    </>
+
+      {/* XP GRAPH */}
+      <div className="mb-12">
+        <canvas
+          ref={xpCanvasRef}
+          className="w-full h-32 rounded-xl bg-black/40 border border-purple-500/20"
+        />
+        <div className="flex justify-between text-xs text-purple-300 mt-2">
+          <span>Level {hunter.level}</span>
+          <span>
+            {hunter.xp} / {hunter.maxXp} XP
+          </span>
+        </div>
+      </div>
+
+      {/* MAIN QUEST */}
+      <div className="rounded-2xl border border-purple-500/30 bg-black/60 backdrop-blur-xl p-8 mb-12 shadow-[0_0_80px_rgba(168,85,247,0.35)]">
+        <p className="text-xs tracking-widest uppercase text-purple-300 mb-2">
+          Today’s Main Quest
+        </p>
+
+        <h2 className="text-xl font-semibold mb-4">
+          {hunter.mainQuest.title}
+        </h2>
+
+        <div className="flex items-center gap-4 mb-6">
+          <span className="px-3 py-1 text-xs rounded bg-green-500/20 text-green-300">
+            {hunter.mainQuest.difficulty}
+          </span>
+          <span className="text-yellow-400 text-sm">
+            +{hunter.mainQuest.xp} XP
+          </span>
+        </div>
+
+        <button className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 font-semibold tracking-wide hover:scale-105 transition">
+          START QUEST
+        </button>
+      </div>
+
+      {/* STATS + GRAPH */}
+      <div className="grid grid-cols-3 gap-6">
+        <Stat title="Tasks Completed" value={hunter.tasksToday} />
+        <Stat title="Current Streak" value={`${hunter.streak} Days`} />
+        <Stat title="Focus Time" value={hunter.focusTime} />
+      </div>
+
+      {/* AURA GRAPH */}
+      <div className="flex justify-center mt-14">
+        <canvas ref={auraCanvasRef} />
+      </div>
+    </div>
   );
 }
 
 /* ===============================
- * SYSTEM STAT — SMALL HUD BLOCK
+ * STAT CARD
  * =============================== */
-
-function SystemStat({ label, value }) {
+function Stat({ title, value }) {
   return (
-    <div
-      className="rounded-xl border border-purple-500/30
-      bg-white/5 backdrop-blur-md
-      px-4 py-3 text-center"
-    >
-      <p className="text-[10px] tracking-[0.35em] uppercase text-purple-300">
-        {label}
+    <div className="rounded-xl border border-purple-500/20 bg-black/40 p-6 text-center backdrop-blur">
+      <p className="text-xs uppercase tracking-widest text-purple-300 mb-1">
+        {title}
       </p>
-      <p className="mt-1 text-sm font-semibold text-purple-100">
-        {value}
-      </p>
+      <p className="text-lg font-semibold">{value}</p>
     </div>
   );
 }
