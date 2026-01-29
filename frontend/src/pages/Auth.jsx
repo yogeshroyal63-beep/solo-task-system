@@ -8,26 +8,12 @@ import AuraButton from "../components/AuraButton";
  * ===============================
  * AUTH — SYSTEM RECOGNITION
  * ===============================
- *
- * This is not a normal auth page.
- * This is where the SYSTEM recognizes:
- * - a returning hunter
- * - or a new awakening candidate
  */
 
 export default function Auth({ onAuthSuccess }) {
-  /* ===============================
-   * MODE CONTROL
-   * =============================== */
   const [mode, setMode] = useState("LOGIN");
-  /**
-   * LOGIN  -> Returning hunter
-   * SIGNUP -> New hunter
-   */
+  const [error, setError] = useState("");
 
-  /* ===============================
-   * FORM STATE
-   * =============================== */
   const [form, setForm] = useState({
     fullName: "",
     nickname: "",
@@ -38,29 +24,99 @@ export default function Auth({ onAuthSuccess }) {
   const update = (key) => (e) =>
     setForm({ ...form, [key]: e.target.value });
 
-  /* ===============================
-   * SUBMIT HANDLERS
-   * =============================== */
+  const users =
+    JSON.parse(localStorage.getItem("users")) || [];
 
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  /* ===============================
+   * LOGIN
+   * =============================== */
   const handleLogin = () => {
-    /**
-     * Later this will call backend.
-     * For now, recognition is assumed successful.
-     */
+    setError("");
+
+    if (!form.email || !form.password) {
+      setError("Enter your credentials");
+      return;
+    }
+
+    if (!isValidEmail(form.email)) {
+      setError("Enter a valid email address");
+      return;
+    }
+
+    const user = users.find(
+      (u) =>
+        u.email === form.email &&
+        u.password === form.password
+    );
+
+    if (!user) {
+      setError("Check your credentials");
+      return;
+    }
+
+    localStorage.setItem(
+      "hunter",
+      JSON.stringify(user)
+    );
+
     onAuthSuccess("RETURNING");
   };
 
+  /* ===============================
+   * SIGNUP
+   * =============================== */
   const handleSignup = () => {
-    /**
-     * Full name + nickname matter.
-     * Nickname becomes the hunter identity.
-     */
+    setError("");
+
+    if (
+      !form.fullName ||
+      !form.nickname ||
+      !form.email ||
+      !form.password
+    ) {
+      setError("Enter all credentials");
+      return;
+    }
+
+    if (!isValidEmail(form.email)) {
+      setError("Enter a valid email address");
+      return;
+    }
+
+    const exists = users.find(
+      (u) => u.email === form.email
+    );
+
+    if (exists) {
+      setError("Email already registered");
+      return;
+    }
+
+    const newUser = {
+      fullName: form.fullName,
+      nickname: form.nickname,
+      email: form.email,
+      password: form.password,
+      awakenedForm: null,
+      level: 1,
+      xp: 0,
+    };
+
+    const updatedUsers = [...users, newUser];
+    localStorage.setItem(
+      "users",
+      JSON.stringify(updatedUsers)
+    );
+    localStorage.setItem(
+      "hunter",
+      JSON.stringify(newUser)
+    );
+
     onAuthSuccess("NEW");
   };
-
-  /* ===============================
-   * RENDER
-   * =============================== */
 
   return (
     <>
@@ -68,15 +124,13 @@ export default function Auth({ onAuthSuccess }) {
 
       <div className="min-h-screen flex items-center justify-center text-white">
         <div className="w-full max-w-xl mx-6">
-
-          {/* ===== SYSTEM PANEL ===== */}
           <div
             className="rounded-2xl border border-purple-500/40
             bg-gradient-to-br from-[#0b0f2a]/95 to-[#060816]/95
             backdrop-blur-md shadow-[0_0_60px_rgba(168,85,247,0.25)]
             p-10 space-y-8"
           >
-            {/* ===== TITLE ===== */}
+            {/* TITLE */}
             <div className="space-y-2">
               <h2 className="text-sm tracking-[0.6em] uppercase text-purple-300">
                 {mode === "LOGIN"
@@ -91,7 +145,14 @@ export default function Auth({ onAuthSuccess }) {
               </p>
             </div>
 
-            {/* ===== FORM ===== */}
+            {/* ERROR */}
+            {error && (
+              <p className="text-red-400 text-sm">
+                {error}
+              </p>
+            )}
+
+            {/* FORM */}
             <div className="space-y-6">
               {mode === "SIGNUP" && (
                 <>
@@ -100,7 +161,6 @@ export default function Auth({ onAuthSuccess }) {
                     value={form.fullName}
                     onChange={update("fullName")}
                   />
-
                   <AuraInput
                     label="Hunter Nickname"
                     value={form.nickname}
@@ -124,12 +184,15 @@ export default function Auth({ onAuthSuccess }) {
               />
             </div>
 
-            {/* ===== ACTIONS ===== */}
+            {/* ACTIONS */}
             <div className="flex items-center justify-between pt-4">
-              {/* Mode switch */}
               <button
                 onClick={() =>
-                  setMode(mode === "LOGIN" ? "SIGNUP" : "LOGIN")
+                  setMode(
+                    mode === "LOGIN"
+                      ? "SIGNUP"
+                      : "LOGIN"
+                  )
                 }
                 className="text-xs tracking-[0.4em] uppercase text-purple-300 hover:text-purple-100 transition"
               >
@@ -138,7 +201,6 @@ export default function Auth({ onAuthSuccess }) {
                   : "Already Recognized"}
               </button>
 
-              {/* Primary action */}
               <AuraButton
                 primary
                 label={
