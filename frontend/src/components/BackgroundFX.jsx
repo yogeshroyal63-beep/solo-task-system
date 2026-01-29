@@ -1,34 +1,78 @@
+import { useEffect, useRef } from "react";
+
+/**
+ * ===============================
+ * BACKGROUND FX — CINEMATIC DEPTH
+ * ===============================
+ * Starfield + subtle motion
+ * Purely decorative
+ */
+
 export default function BackgroundFX() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    let w, h;
+    const resize = () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Create stars
+    const stars = Array.from({ length: 120 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.2,
+      s: Math.random() * 0.3 + 0.05,
+    }));
+
+    let raf;
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.fillStyle = "#ffffff";
+      stars.forEach((s) => {
+        ctx.globalAlpha = 0.15;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        s.y += s.s;
+        if (s.y > h) {
+          s.y = 0;
+          s.x = Math.random() * w;
+        }
+      });
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      {/* Base gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#050510] via-[#0b1025] to-[#120a2a]" />
+    <div className="fixed inset-0 z-[-20] pointer-events-none">
+      {/* STARFIELD */}
+      <canvas ref={canvasRef} className="absolute inset-0" />
 
-      {/* Perspective grid */}
-      <div
-        className="absolute inset-0 opacity-[0.15]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(168,85,247,0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,0.25) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-          transform: "perspective(800px) rotateX(65deg)",
-          transformOrigin: "top center",
-        }}
-      />
+      {/* DARK GRADIENT */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#02010a] via-[#0a0433] to-black" />
 
-      {/* Data corridor glow */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent blur-3xl opacity-60" />
+      {/* VIGNETTE */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_40%,rgba(0,0,0,0.85)_100%)]" />
 
-      {/* Light streaks */}
-      <div className="absolute top-0 left-1/2 w-[2px] h-full bg-gradient-to-b from-transparent via-purple-400/40 to-transparent animate-pulseSlow" />
-      <div className="absolute top-0 left-[48%] w-[1px] h-full bg-gradient-to-b from-transparent via-pink-400/30 to-transparent animate-pulseSlow" />
-
-      {/* Ambient glow blobs */}
-      <div className="absolute top-[-200px] left-1/4 w-[500px] h-[500px] bg-purple-600/30 blur-[160px] animate-pulseSlow" />
-      <div className="absolute bottom-[-200px] right-1/4 w-[500px] h-[500px] bg-pink-600/20 blur-[160px] animate-pulseSlow" />
-
-      {/* Horizon line */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-purple-400/40 to-transparent" />
+      {/* FILM NOISE */}
+      <div className="absolute inset-0 opacity-[0.08] noise-bg" />
     </div>
   );
 }
