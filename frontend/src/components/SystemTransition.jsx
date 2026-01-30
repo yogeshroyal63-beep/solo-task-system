@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 
 /**
  * ===============================
- * SYSTEM TRANSITION (SAFE)
+ * SYSTEM TRANSITION (SCROLL SAFE)
  * ===============================
- * Does NOT break fixed positioning
  */
 
 export default function SystemTransition({ phaseKey, children }) {
@@ -17,7 +16,8 @@ export default function SystemTransition({ phaseKey, children }) {
   }, [phaseKey]);
 
   return (
-    <div className="fixed inset-0 pointer-events-none">
+    <div className="relative w-full min-h-screen pointer-events-none">
+
       <div
         className={`
           w-full h-full
