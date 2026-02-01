@@ -2,16 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== GLOBAL ===== */
-html, body {
-  min-height: 100%;
+/* =====================================
+   GLOBAL SCROLL — CLEAN & CORRECT
+   ===================================== */
+
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
   overflow-x: hidden;
   overflow-y: auto;
   background: #000;
 }
 
-/* ===== HUD FONT ===== */
+/* =====================================
+   HUD FONT
+   ===================================== */
+
 :root {
   --hud-font: "Orbitron", system-ui, sans-serif;
 }
@@ -23,14 +31,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ===== HUD TEXT GLOW ===== */
+/* =====================================
+   HUD TEXT GLOW
+   ===================================== */
+
 .hud-text {
   text-shadow:
     0 0 6px rgba(168, 85, 247, 0.6),
     0 0 12px rgba(168, 85, 247, 0.35);
 }
 
-/* ===== FLOAT / PULSE ===== */
+/* =====================================
+   FLOAT / PULSE
+   ===================================== */
+
 @keyframes floatSlow {
   0% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
@@ -50,7 +64,10 @@ body {
   animation: pulseSlow 8s ease-in-out infinite;
 }
 
-/* ===== SPIN ===== */
+/* =====================================
+   SPIN
+   ===================================== */
+
 @keyframes spinSlow {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -69,7 +86,10 @@ body {
   animation: spinReverse 14s linear infinite;
 }
 
-/* ===== AURA ===== */
+/* =====================================
+   AURA BREATH
+   ===================================== */
+
 @keyframes auraBreath {
   0% { transform: scale(0.95); opacity: 0.6; }
   50% { transform: scale(1.05); opacity: 1; }
@@ -80,7 +100,10 @@ body {
   animation: auraBreath 6s ease-in-out infinite;
 }
 
-/* ===== SYSTEM POP ===== */
+/* =====================================
+   SYSTEM POP
+   ===================================== */
+
 @keyframes systemPop {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
@@ -90,7 +113,10 @@ body {
   animation: systemPop 220ms ease-out;
 }
 
-/* ===== LEVEL UP ===== */
+/* =====================================
+   LEVEL UP
+   ===================================== */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -110,7 +136,10 @@ body {
   animation: scaleUp 0.8s ease forwards;
 }
 
-/* ===== ENERGY SWEEP ===== */
+/* =====================================
+   ENERGY SWEEP
+   ===================================== */
+
 @keyframes energySweep {
   from { background-position: -200% center; }
   to { background-position: 200% center; }
@@ -120,27 +149,13 @@ body {
   background-size: 200% auto;
   animation: energySweep 2.5s linear infinite;
 }
-html, body, #root {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
+
 /* =====================================
-   FORCE SCROLLBAR — SYSTEM OVERRIDE
+   SCROLLBAR (VISIBLE BUT CLEAN)
    ===================================== */
 
-/* Always allow scrolling */
-html,
-body,
-#root {
-  height: 100%;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-/* Force scrollbar to be visible */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -165,16 +180,7 @@ body,
 }
 
 /* Firefox */
-
-/* =====================================
-   HARD FORCE SCROLL — DEBUG MODE
-   ===================================== */
-
-/* Force the page to be taller than viewport */
-
-
-/* Ensure nothing can disable scrolling */
-html, body {
-  overflow-y: scroll !important;
-  overflow-x: hidden !important;
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.9) rgba(0, 0, 0, 0.6);
 }

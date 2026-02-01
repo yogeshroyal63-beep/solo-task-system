@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 
 /**
  * ===============================
- * SYSTEM TRANSITION (SCROLL SAFE)
+ * SYSTEM TRANSITION — SAFE
  * ===============================
+ * Does NOT break scroll
+ * Does NOT lock viewport
  */
 
 export default function SystemTransition({ phaseKey, children }) {
@@ -16,8 +18,7 @@ export default function SystemTransition({ phaseKey, children }) {
   }, [phaseKey]);
 
   return (
-    <div className="relative w-full min-h-screen pointer-events-none">
-
+    <div className="absolute inset-0 pointer-events-none">
       <div
         className={`
           w-full h-full
