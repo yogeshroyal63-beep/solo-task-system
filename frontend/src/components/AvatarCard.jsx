@@ -1,13 +1,7 @@
 /**
  * ===============================
- * AVATAR CARD — AWAKENED FORM
+ * AVATAR CARD — AWAKENING FORM
  * ===============================
- *
- * Responsibilities:
- * - Show character silhouette
- * - Respond to hover
- * - Lock selection visually
- * - Suppress non-selected forms
  */
 
 export default function AvatarCard({ avatar, selected, onSelect }) {
@@ -15,60 +9,44 @@ export default function AvatarCard({ avatar, selected, onSelect }) {
     <div
       onClick={onSelect}
       className={`
-        relative cursor-pointer rounded-2xl overflow-hidden
-        border transition-all duration-300 ease-out
+        relative cursor-pointer
+        rounded-3xl overflow-hidden
+        border
+        transition-all duration-300
         ${
           selected
-            ? "border-purple-400 shadow-[0_0_40px_rgba(168,85,247,0.7)] scale-[1.02]"
-            : "border-purple-500/30 hover:border-purple-400/60 hover:scale-[1.01]"
+            ? "border-purple-500 shadow-[0_0_90px_rgba(168,85,247,0.6)] scale-[1.02]"
+            : "border-purple-500/20 hover:border-purple-400/60"
         }
+        bg-black/70
       `}
     >
-      {/* ===== CHARACTER VISUAL ===== */}
-      <div className="relative h-56 bg-gradient-to-b from-[#0b0f2a] to-[#050817]">
-        {/* Silhouette */}
-        <div
-          className={`
-            absolute inset-0 bg-center bg-no-repeat bg-contain
-            transition-all duration-300
-            ${
-              selected
-                ? "opacity-100"
-                : "opacity-70 group-hover:opacity-90"
-            }
-          `}
-          style={{
-            backgroundImage: "url('/placeholder-avatar.png')",
-          }}
+      {/* ===== IMAGE ===== */}
+      <div className="relative h-72 w-full">
+        <img
+          src={avatar.image}
+          alt={avatar.name}
+          className="w-full h-full object-cover opacity-90"
         />
 
-        {/* Aura overlay */}
-        <div
-          className={`
-            absolute inset-0 transition-opacity duration-300
-            ${
-              selected
-                ? "bg-purple-500/10"
-                : "bg-black/30"
-            }
-          `}
-        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
       </div>
 
-      {/* ===== INFO ===== */}
-      <div className="p-4 text-center space-y-2 bg-black/60 backdrop-blur-md">
-        <p className="text-sm tracking-widest uppercase text-purple-200">
+      {/* ===== TEXT ===== */}
+      <div className="relative p-6 space-y-2">
+        <h3 className="text-lg font-semibold hud-text tracking-wide">
           {avatar.name}
-        </p>
+        </h3>
 
-        <p className="text-xs text-purple-400">
+        <p className="text-sm text-purple-300 leading-relaxed">
           {avatar.description}
         </p>
       </div>
 
-      {/* ===== LOCK INDICATOR ===== */}
+      {/* ===== SELECTED INDICATOR ===== */}
       {selected && (
-        <div className="absolute top-3 right-3 text-purple-300 text-xs tracking-widest">
+        <div className="absolute top-4 right-4 text-xs tracking-widest text-purple-300">
           SELECTED
         </div>
       )}

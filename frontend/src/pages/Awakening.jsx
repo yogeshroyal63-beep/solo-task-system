@@ -20,35 +20,36 @@ export default function Awakening({ onConfirm }) {
    * =============================== */
 
   const awakenedForms = {
-    male: [
-      {
-        id: "shadow_sovereign",
-        name: "Shadow Sovereign",
-        description:
-          "One who commands shadows and bends death itself.",
-      },
-      {
-        id: "blade_executor",
-        name: "Blade Executor",
-        description:
-          "A hunter whose blade never hesitates.",
-      },
-    ],
-    female: [
-      {
-        id: "arcane_empress",
-        name: "Arcane Empress",
-        description:
-          "A vessel of overwhelming magical authority.",
-      },
-      {
-        id: "silent_reaper",
-        name: "Silent Reaper",
-        description:
-          "A presence felt only after death arrives.",
-      },
-    ],
-  };
+  male: [
+    {
+      id: "shadow_sovereign",
+      name: "Shadow Sovereign",
+      description: "One who commands shadows and bends death itself.",
+      image: "/characters/shadow_male_1.jpg",
+    },
+    {
+      id: "blade_executor",
+      name: "Blade Executor",
+      description: "A hunter whose blade never hesitates.",
+      image: "/characters/shadow_male_2.jpg",
+    },
+  ],
+  female: [
+    {
+      id: "arcane_empress",
+      name: "Arcane Empress",
+      description: "A vessel of overwhelming magical authority.",
+      image: "/characters/shadow_female_1.jpg",
+    },
+    {
+      id: "resonance_vessel",
+      name: "Resonance Vessel",
+      description:
+                "A human vessel with extreme emotional resonance. Power does not come from dominance — but from survival, fear, and persistence. Rare. Unstable. Irreplaceable.",
+}
+
+  ],
+};
 
   /* ===============================
    * STATE
