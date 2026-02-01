@@ -2,108 +2,81 @@ import { useEffect, useRef } from "react";
 
 /**
  * =====================================
- * PRESSURE GRAPH — SYSTEM CORE HUD
+ * PRESSURE GRAPH — RADIAL SYSTEM CORE
  * =====================================
- * Multi-ring intimidation graph
- * Visual only (no state mutations)
+ * Pure visual
+ * No state mutation
  */
 
-export default function PressureGraph({ value = 0 }) {
+export default function PressureGraph({ value = 0.6 }) {
   const canvasRef = useRef(null);
-  const rafRef = useRef(null);
-  let rotation = 0;
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    const size = 320;
-    canvas.width = size;
-    canvas.height = size;
+    const size = canvas.width;
+    const center = size / 2;
+    const radius = size * 0.32;
 
-    const c = size / 2;
+    let frame = 0;
 
     const draw = () => {
       ctx.clearRect(0, 0, size, size);
 
-      /* ===============================
-         OUTER AUTHORITY RING
-         =============================== */
+      // background ring
       ctx.beginPath();
-      ctx.arc(c, c, 140, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(168,85,247,0.25)";
+      ctx.arc(center, center, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(168,85,247,0.15)";
       ctx.lineWidth = 10;
       ctx.stroke();
 
-      /* ===============================
-         ROTATING SEGMENT RING
-         =============================== */
-      ctx.save();
-      ctx.translate(c, c);
-      ctx.rotate(rotation);
-      ctx.translate(-c, -c);
-
-      for (let i = 0; i < 32; i++) {
-        const start = (Math.PI * 2 / 32) * i;
-        const end = start + Math.PI * 0.04;
-
-        ctx.beginPath();
-        ctx.arc(c, c, 120, start, end);
-        ctx.strokeStyle = "rgba(168,85,247,0.6)";
-        ctx.lineWidth = 6;
-        ctx.stroke();
-      }
-      ctx.restore();
-
-      /* ===============================
-         PRESSURE ARC (PULSING)
-         =============================== */
-      const pulse = Math.sin(Date.now() * 0.004) * 6;
+      // animated wave ring
+      const wave = Math.sin(frame * 0.05) * 6;
 
       ctx.beginPath();
       ctx.arc(
-        c,
-        c,
-        92 + pulse,
+        center,
+        center,
+        radius + wave,
         -Math.PI / 2,
         Math.PI * 2 * value - Math.PI / 2
       );
-      ctx.strokeStyle = "rgba(236,72,153,0.95)";
-      ctx.lineWidth = 14;
-      ctx.shadowBlur = 24;
-      ctx.shadowColor = "rgba(236,72,153,0.8)";
+      ctx.strokeStyle = "rgba(168,85,247,0.9)";
+      ctx.lineWidth = 12;
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "rgba(168,85,247,0.8)";
       ctx.stroke();
 
-      /* ===============================
-         INNER CORE RING
-         =============================== */
+      // inner glow
       ctx.beginPath();
-      ctx.arc(c, c, 62, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(168,85,247,0.4)";
+      ctx.arc(center, center, radius - 18, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(236,72,153,0.4)";
       ctx.lineWidth = 4;
       ctx.stroke();
 
-      rotation += 0.0025;
-      rafRef.current = requestAnimationFrame(draw);
+      frame++;
+      requestAnimationFrame(draw);
     };
 
     draw();
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
   }, [value]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      <canvas ref={canvasRef} />
+      <canvas
+        ref={canvasRef}
+        width={260}
+        height={260}
+        className="block"
+      />
 
-      {/* ===== CENTER READOUT ===== */}
+      {/* CENTER TEXT */}
       <div className="absolute text-center">
-        <p className="text-[10px] tracking-[0.4em] text-purple-400 uppercase">
+        <p className="text-xs tracking-[0.4em] text-purple-400 uppercase">
           Pressure
         </p>
-        <p className="text-3xl font-extrabold hud-text">
+        <p className="text-2xl font-bold hud-text">
           {Math.round(value * 100)}%
         </p>
       </div>
